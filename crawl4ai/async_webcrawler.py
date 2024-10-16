@@ -35,6 +35,7 @@ class AsyncWebCrawler:
         os.makedirs(f"{self.crawl4ai_folder}/cache", exist_ok=True)
         self.ready = False
         self.verbose = kwargs.get("verbose", False)
+        self.reranker = None
 
     async def __aenter__(self):
         await self.crawler_strategy.__aenter__()
