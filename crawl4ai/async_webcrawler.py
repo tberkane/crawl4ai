@@ -250,6 +250,7 @@ class AsyncWebCrawler:
                 sections = chunking_strategy.chunk(markdown)
 
                 if query:
+                    print("[DEBUG] Query received: ", query)
                     truncated_sections = [section[:200] for section in sections]
                     if verbose:
                         print(
