@@ -4,18 +4,19 @@ from pathlib import Path
 from typing import Optional
 import json
 import asyncio
+from sentence_transformers import CrossEncoder
 from .models import CrawlResult
 from .async_database import async_db_manager
 from .chunking_strategy import *
 from .extraction_strategy import *
-from .async_crawler_strategy import AsyncCrawlerStrategy, AsyncPlaywrightCrawlerStrategy, AsyncCrawlResponse
+from .async_crawler_strategy import (
+    AsyncCrawlerStrategy,
+    AsyncPlaywrightCrawlerStrategy,
+    AsyncCrawlResponse,
+)
 from .content_scrapping_strategy import WebScrappingStrategy
 from .config import MIN_WORD_THRESHOLD, IMAGE_DESCRIPTION_MIN_WORD_THRESHOLD
-from .utils import (
-    sanitize_input_encode,
-    InvalidCSSSelectorError,
-    format_html
-)
+from .utils import sanitize_input_encode, InvalidCSSSelectorError, format_html
 
 
 class AsyncWebCrawler:
@@ -68,6 +69,7 @@ class AsyncWebCrawler:
         screenshot: bool = False,
         user_agent: str = None,
         verbose=True,
+        query: str = None,
         **kwargs,
     ) -> CrawlResult:
         try:
@@ -77,7 +79,7 @@ class AsyncWebCrawler:
                 raise ValueError("Unsupported extraction strategy")
             if not isinstance(chunking_strategy, ChunkingStrategy):
                 raise ValueError("Unsupported chunking strategy")
-            
+
             word_count_threshold = max(word_count_threshold, MIN_WORD_THRESHOLD)
 
             async_response: AsyncCrawlResponse = None
@@ -102,7 +104,9 @@ class AsyncWebCrawler:
                 t1 = time.time()
                 if user_agent:
                     self.crawler_strategy.update_user_agent(user_agent)
-                async_response: AsyncCrawlResponse = await self.crawler_strategy.crawl(url, screenshot=screenshot, **kwargs)
+                async_response: AsyncCrawlResponse = await self.crawler_strategy.crawl(
+                    url, screenshot=screenshot, **kwargs
+                )
                 html = sanitize_input_encode(async_response.html)
                 screenshot_data = async_response.screenshot
                 t2 = time.time()
@@ -123,10 +127,15 @@ class AsyncWebCrawler:
                 verbose,
                 bool(cached),
                 async_response=async_response,
+                query=query,
                 **kwargs,
             )
-            crawl_result.status_code = async_response.status_code if async_response else 200
-            crawl_result.response_headers = async_response.response_headers if async_response else {}
+            crawl_result.status_code = (
+                async_response.status_code if async_response else 200
+            )
+            crawl_result.response_headers = (
+                async_response.response_headers if async_response else {}
+            )
             crawl_result.success = bool(html)
             crawl_result.session_id = kwargs.get("session_id", None)
             return crawl_result
@@ -147,6 +156,7 @@ class AsyncWebCrawler:
         screenshot: bool = False,
         user_agent: str = None,
         verbose=True,
+        query: str = None,
         **kwargs,
     ) -> List[CrawlResult]:
         tasks = [
@@ -160,12 +170,12 @@ class AsyncWebCrawler:
                 screenshot,
                 user_agent,
                 verbose,
-                **kwargs
+                query=query,
+                **kwargs,
             )
             for url in urls
         ]
         return await asyncio.gather(*tasks)
-
 
     async def aprocess_html(
         self,
@@ -179,6 +189,7 @@ class AsyncWebCrawler:
         screenshot: str,
         verbose: bool,
         is_cached: bool,
+        query: str = None,
         **kwargs,
     ) -> CrawlResult:
         t = time.time()
@@ -193,7 +204,8 @@ class AsyncWebCrawler:
                 css_selector=css_selector,
                 only_text=kwargs.get("only_text", False),
                 image_description_min_word_threshold=kwargs.get(
-                    "image_description_min_word_threshold", IMAGE_DESCRIPTION_MIN_WORD_THRESHOLD
+                    "image_description_min_word_threshold",
+                    IMAGE_DESCRIPTION_MIN_WORD_THRESHOLD,
                 ),
             )
             if verbose:
@@ -202,11 +214,15 @@ class AsyncWebCrawler:
                 )
 
             if result is None:
-                raise ValueError(f"Process HTML, Failed to extract content from the website: {url}")
+                raise ValueError(
+                    f"Process HTML, Failed to extract content from the website: {url}"
+                )
         except InvalidCSSSelectorError as e:
             raise ValueError(str(e))
         except Exception as e:
-            raise ValueError(f"Process HTML, Failed to extract content from the website: {url}, error: {str(e)}")
+            raise ValueError(
+                f"Process HTML, Failed to extract content from the website: {url}, error: {str(e)}"
+            )
 
         cleaned_html = sanitize_input_encode(result.get("cleaned_html", ""))
         markdown = sanitize_input_encode(result.get("markdown", ""))
@@ -221,14 +237,55 @@ class AsyncWebCrawler:
                 )
 
             # Check if extraction strategy is type of JsonCssExtractionStrategy
-            if isinstance(extraction_strategy, JsonCssExtractionStrategy) or isinstance(extraction_strategy, JsonCssExtractionStrategy):
+            if isinstance(extraction_strategy, JsonCssExtractionStrategy) or isinstance(
+                extraction_strategy, JsonCssExtractionStrategy
+            ):
                 extraction_strategy.verbose = verbose
                 extracted_content = extraction_strategy.run(url, [html])
-                extracted_content = json.dumps(extracted_content, indent=4, default=str, ensure_ascii=False)
+                extracted_content = json.dumps(
+                    extracted_content, indent=4, default=str, ensure_ascii=False
+                )
             else:
                 sections = chunking_strategy.chunk(markdown)
+
+                if query:
+                    truncated_sections = [section[:200] for section in sections]
+                    print(
+                        f"[DEBUG] Number of truncated sections: {len(truncated_sections)}"
+                    )
+                    if not self.reranker:
+                        print("[DEBUG] Initializing reranker")
+                        self.reranker = CrossEncoder(
+                            "mixedbread-ai/mxbai-rerank-xsmall-v1"
+                        )
+                    reranked_truncated_sections = self.reranker.rank(
+                        query,
+                        truncated_sections,
+                        top_k=len(truncated_sections),
+                        return_documents=True,
+                    )
+                    filtered_results = [
+                        result
+                        for result in reranked_truncated_sections
+                        if result["score"] > 0.6
+                    ]
+                    print(
+                        f"[DEBUG] Number of filtered results: {len(filtered_results)}"
+                    )
+                    sorted_results = sorted(
+                        filtered_results, key=lambda x: x["score"], reverse=True
+                    )
+
+                    truncated_to_full = {section[:200]: section for section in sections}
+
+                    sections = [
+                        truncated_to_full[result["text"]] for result in sorted_results
+                    ]
+
                 extracted_content = extraction_strategy.run(url, sections)
-                extracted_content = json.dumps(extracted_content, indent=4, default=str, ensure_ascii=False)
+                extracted_content = json.dumps(
+                    extracted_content, indent=4, default=str, ensure_ascii=False
+                )
 
         if verbose:
             print(
