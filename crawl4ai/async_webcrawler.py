@@ -251,9 +251,10 @@ class AsyncWebCrawler:
 
                 if query:
                     truncated_sections = [section[:200] for section in sections]
-                    print(
-                        f"[DEBUG] Number of truncated sections: {len(truncated_sections)}"
-                    )
+                    if verbose:
+                        print(
+                            f"[DEBUG] Number of truncated sections: {len(truncated_sections)}"
+                        )
                     if not self.reranker:
                         print("[DEBUG] Initializing reranker")
                         self.reranker = CrossEncoder(
@@ -270,9 +271,10 @@ class AsyncWebCrawler:
                         for result in reranked_truncated_sections
                         if result["score"] > 0.6
                     ]
-                    print(
-                        f"[DEBUG] Number of filtered results: {len(filtered_results)}"
-                    )
+                    if verbose:
+                        print(
+                            f"[DEBUG] Number of filtered sections: {len(filtered_results)}"
+                        )
                     sorted_results = sorted(
                         filtered_results, key=lambda x: x["score"], reverse=True
                     )
