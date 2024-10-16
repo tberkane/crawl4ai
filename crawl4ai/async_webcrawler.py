@@ -284,11 +284,13 @@ class AsyncWebCrawler:
                     sections = [
                         truncated_to_full[result["text"]] for result in sorted_results
                     ]
-
-                extracted_content = extraction_strategy.run(url, sections)
-                extracted_content = json.dumps(
-                    extracted_content, indent=4, default=str, ensure_ascii=False
-                )
+                if not sections:
+                    extracted_content = ""
+                else:
+                    extracted_content = extraction_strategy.run(url, sections)
+                    extracted_content = json.dumps(
+                        extracted_content, indent=4, default=str, ensure_ascii=False
+                    )
 
         if verbose:
             print(
