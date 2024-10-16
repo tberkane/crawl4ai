@@ -250,7 +250,6 @@ class AsyncWebCrawler:
                 sections = chunking_strategy.chunk(markdown)
 
                 if query:
-                    print("[DEBUG] Query received: ", query)
                     truncated_sections = [section[:200] for section in sections]
                     if verbose:
                         print(
@@ -270,7 +269,7 @@ class AsyncWebCrawler:
                     filtered_results = [
                         result
                         for result in reranked_truncated_sections
-                        if result["score"] > 0.6
+                        if result["score"] > 0.02
                     ]
                     if verbose:
                         print(
