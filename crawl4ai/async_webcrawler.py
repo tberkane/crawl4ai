@@ -71,6 +71,7 @@ class AsyncWebCrawler:
         user_agent: str = None,
         verbose=True,
         query: str = None,
+        rerank_threshold: float = 0.02,
         **kwargs,
     ) -> CrawlResult:
         try:
@@ -129,6 +130,7 @@ class AsyncWebCrawler:
                 bool(cached),
                 async_response=async_response,
                 query=query,
+                rerank_threshold=rerank_threshold,
                 **kwargs,
             )
             crawl_result.status_code = (
@@ -158,6 +160,7 @@ class AsyncWebCrawler:
         user_agent: str = None,
         verbose=True,
         query: str = None,
+        rerank_threshold: float = 0.02,
         **kwargs,
     ) -> List[CrawlResult]:
         tasks = [
@@ -172,6 +175,7 @@ class AsyncWebCrawler:
                 user_agent,
                 verbose,
                 query=query,
+                rerank_threshold=rerank_threshold,
                 **kwargs,
             )
             for url in urls
@@ -191,6 +195,7 @@ class AsyncWebCrawler:
         verbose: bool,
         is_cached: bool,
         query: str = None,
+        rerank_threshold: float = 0.02,
         **kwargs,
     ) -> CrawlResult:
         t = time.time()
@@ -269,7 +274,7 @@ class AsyncWebCrawler:
                     filtered_results = [
                         result
                         for result in reranked_truncated_sections
-                        if result["score"] > 0.02
+                        if result["score"] > rerank_threshold
                     ]
                     if verbose:
                         print(
