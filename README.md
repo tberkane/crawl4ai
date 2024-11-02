@@ -1,6 +1,9 @@
-# Crawl4AI (Async Version) 🕷️🤖
+# 🔥🕷️ Crawl4AI: LLM Friendly Web Crawler & Scrapper
+
+<a href="https://trendshift.io/repositories/11716" target="_blank"><img src="https://trendshift.io/api/badge/repositories/11716" alt="unclecode%2Fcrawl4ai | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
 [![GitHub Stars](https://img.shields.io/github/stars/unclecode/crawl4ai?style=social)](https://github.com/unclecode/crawl4ai/stargazers)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/Crawl4AI)
 [![GitHub Forks](https://img.shields.io/github/forks/unclecode/crawl4ai?style=social)](https://github.com/unclecode/crawl4ai/network/members)
 [![GitHub Issues](https://img.shields.io/github/issues/unclecode/crawl4ai)](https://github.com/unclecode/crawl4ai/issues)
 [![GitHub Pull Requests](https://img.shields.io/github/issues-pr/unclecode/crawl4ai)](https://github.com/unclecode/crawl4ai/pulls)
@@ -8,20 +11,24 @@
 
 Crawl4AI simplifies asynchronous web crawling and data extraction, making it accessible for large language models (LLMs) and AI applications. 🆓🌐
 
-> Looking for the synchronous version? Check out [README.sync.md](./README.sync.md). You can also access the previous version in the branch [V0.2.76](https://github.com/unclecode/crawl4ai/blob/v0.2.76).
+## 🌟 Meet the Crawl4AI Assistant: Your Copilot for Crawling
+Use the [Crawl4AI GPT Assistant](https://tinyurl.com/crawl4ai-gpt) as your AI-powered copilot! With this assistant, you can:
+- 🧑‍💻 Generate code for complex crawling and extraction tasks
+- 💡 Get tailored support and examples
+- 📘 Learn Crawl4AI faster with step-by-step guidance
 
-## New update 0.3.6
-- 🌐 Multi-browser support (Chromium, Firefox, WebKit)
-- 🖼️ Improved image processing with lazy-loading detection
-- 🔧 Custom page timeout parameter for better control over crawling behavior
-- 🕰️ Enhanced handling of delayed content loading
-- 🔑 Custom headers support for LLM interactions
-- 🖼️ iframe content extraction for comprehensive page analysis
-- ⏱️ Flexible timeout and delayed content retrieval options
+## New in 0.3.72 ✨
+
+- 📄 Fit markdown generation for extracting main article content.
+- 🪄 Magic mode for comprehensive anti-bot detection bypass.
+- 🌐 Enhanced multi-browser support with seamless switching (Chromium, Firefox, WebKit)
+- 📚 New chunking strategies(Sliding window, Overlapping window, Flexible size control)
+- 💾 Improved caching system for better performance
+- ⚡ Optimized batch processing with automatic rate limiting
 
 ## Try it Now!
 
-✨ Play around with this [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1REChY6fXQf-EaVYLv0eHEWvzlYxGm0pd?usp=sharing)
+✨ Play around with this [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1SgRPrByQLzjRfwoRNq1wSGE9nYY_EE8C?usp=sharing)
 
 ✨ Visit our [Documentation Website](https://crawl4ai.com/mkdocs/)
 
@@ -30,22 +37,28 @@ Crawl4AI simplifies asynchronous web crawling and data extraction, making it acc
 - 🆓 Completely free and open-source
 - 🚀 Blazing fast performance, outperforming many paid services
 - 🤖 LLM-friendly output formats (JSON, cleaned HTML, markdown)
+- 🌐 Multi-browser support (Chromium, Firefox, WebKit)
 - 🌍 Supports crawling multiple URLs simultaneously
 - 🎨 Extracts and returns all media tags (Images, Audio, and Video)
 - 🔗 Extracts all external and internal links
 - 📚 Extracts metadata from the page
-- 🔄 Custom hooks for authentication, headers, and page modifications before crawling
+- 🔄 Custom hooks for authentication, headers, and page modifications
 - 🕵️ User-agent customization
-- 🖼️ Takes screenshots of the page
+- 🖼️ Takes screenshots of pages with enhanced error handling
 - 📜 Executes multiple custom JavaScripts before crawling
 - 📊 Generates structured output without LLM using JsonCssExtractionStrategy
 - 📚 Various chunking strategies: topic-based, regex, sentence, and more
 - 🧠 Advanced extraction strategies: cosine clustering, LLM, and more
 - 🎯 CSS selector support for precise data extraction
 - 📝 Passes instructions/keywords to refine extraction
-- 🔒 Proxy support for enhanced privacy and access
-- 🔄 Session management for complex multi-page crawling scenarios
-- 🌐 Asynchronous architecture for improved performance and scalability
+- 🔒 Proxy support with authentication for enhanced access
+- 🔄 Session management for complex multi-page crawling
+- 🌐 Asynchronous architecture for improved performance
+- 🖼️ Improved image processing with lazy-loading detection
+- 🕰️ Enhanced handling of delayed content loading
+- 🔑 Custom headers support for LLM interactions
+- 🖼️ iframe content extraction for comprehensive analysis
+- ⏱️ Flexible timeout and delayed content retrieval options
 
 ## Installation 🛠️
 
@@ -387,6 +400,34 @@ For questions, suggestions, or feedback, feel free to reach out:
 - Website: [crawl4ai.com](https://crawl4ai.com)
 
 Happy Crawling! 🕸️🚀
+
+
+# Mission
+
+Our mission is to unlock the untapped potential of personal and enterprise data in the digital age. In today's world, individuals and organizations generate vast amounts of valuable digital footprints, yet this data remains largely uncapitalized as a true asset. 
+
+Our open-source solution empowers developers and innovators to build tools for data extraction and structuring, laying the foundation for a new era of data ownership. By transforming personal and enterprise data into structured, tradeable assets, we're creating opportunities for individuals to capitalize on their digital footprints and for organizations to unlock the value of their collective knowledge.
+
+This democratization of data represents the first step toward a shared data economy, where willing participation in data sharing drives AI advancement while ensuring the benefits flow back to data creators. Through this approach, we're building a future where AI development is powered by authentic human knowledge rather than synthetic alternatives.
+
+![Mission Diagram](./docs/assets/pitch-dark.svg)
+
+For a detailed exploration of our vision, opportunities, and pathway forward, please see our [full mission statement](./MISSION.md).
+
+## Key Opportunities
+
+- **Data Capitalization**: Transform digital footprints into valuable assets that can appear on personal and enterprise balance sheets
+- **Authentic Data**: Unlock the vast reservoir of real human insights and knowledge for AI advancement
+- **Shared Economy**: Create new value streams where data creators directly benefit from their contributions
+
+## Development Pathway
+
+1. **Open-Source Foundation**: Building transparent, community-driven data extraction tools
+2. **Data Capitalization Platform**: Creating tools to structure and value digital assets
+3. **Shared Data Marketplace**: Establishing an economic platform for ethical data exchange
+
+For a detailed exploration of our vision, challenges, and solutions, please see our [full mission statement](./MISSION.md).
+
 
 ## Star History
 
