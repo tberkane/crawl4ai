@@ -278,7 +278,7 @@ class AsyncWebCrawler:
                             "mixedbread-ai/mxbai-rerank-xsmall-v1"
                         )
                     reranked_truncated_sections = sorted(
-                        reranker.rank(
+                        self.reranker.rank(
                             query,
                             truncated_sections,
                             top_k=len(truncated_sections),
@@ -288,7 +288,7 @@ class AsyncWebCrawler:
                     )
 
                     date_reranked_truncated_sections = sorted(
-                        reranker.rank(
+                        self.reranker.rank(
                             "date",
                             truncated_sections,
                             top_k=len(truncated_sections),
@@ -303,7 +303,8 @@ class AsyncWebCrawler:
                             reranked_truncated_sections,
                             date_reranked_truncated_sections,
                         )
-                        if result["score"] > 0.05 or date_result["score"] > 0.2
+                        if result["score"] > rerank_threshold
+                        or date_result["score"] > 0.2
                     ]
                     if verbose:
                         print(
