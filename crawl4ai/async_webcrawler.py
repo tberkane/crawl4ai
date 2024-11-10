@@ -148,7 +148,13 @@ class AsyncWebCrawler:
             if not hasattr(e, "msg"):
                 e.msg = str(e)
             print(f"[ERROR] 🚫 arun(): Failed to crawl {url}, error: {e.msg}")
-            return CrawlResult(url=url, html="", markdown = f"[ERROR] 🚫 arun(): Failed to crawl {url}, error: {e.msg}", success=False, error_message=e.msg)
+            return CrawlResult(
+                url=url,
+                html="",
+                markdown=f"[ERROR] 🚫 arun(): Failed to crawl {url}, error: {e.msg}",
+                success=False,
+                error_message=e.msg,
+            )
 
     async def arun_many(
         self,
@@ -281,6 +287,10 @@ class AsyncWebCrawler:
                         result
                         for result in reranked_truncated_sections
                         if result["score"] > rerank_threshold
+                        or (
+                            "updated" in result["text"].lower()
+                            or "published" in result["text"].lower()
+                        )
                     ]
                     if verbose:
                         print(
@@ -330,7 +340,7 @@ class AsyncWebCrawler:
             cleaned_html=format_html(cleaned_html),
             markdown=markdown,
             fit_markdown=fit_markdown,
-            fit_html= fit_html,
+            fit_html=fit_html,
             media=media,
             links=links,
             metadata=metadata,
