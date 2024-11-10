@@ -277,18 +277,24 @@ class AsyncWebCrawler:
                         self.reranker = CrossEncoder(
                             "mixedbread-ai/mxbai-rerank-xsmall-v1"
                         )
-                    reranked_truncated_sections = self.reranker.rank(
-                        query,
-                        truncated_sections,
-                        top_k=len(truncated_sections),
-                        return_documents=True,
+                    reranked_truncated_sections = sorted(
+                        reranker.rank(
+                            query,
+                            truncated_sections,
+                            top_k=len(truncated_sections),
+                            return_documents=True,
+                        ),
+                        key=lambda x: x["corpus_id"],
                     )
 
-                    date_reranked_truncated_sections = self.reranker.rank(
-                        "date",
-                        truncated_sections,
-                        top_k=len(truncated_sections),
-                        return_documents=True,
+                    date_reranked_truncated_sections = sorted(
+                        reranker.rank(
+                            "date",
+                            truncated_sections,
+                            top_k=len(truncated_sections),
+                            return_documents=True,
+                        ),
+                        key=lambda x: x["corpus_id"],
                     )
 
                     filtered_results = [
@@ -297,21 +303,17 @@ class AsyncWebCrawler:
                             reranked_truncated_sections,
                             date_reranked_truncated_sections,
                         )
-                        if result["score"] > rerank_threshold
-                        or date_result["score"] > 0.2
+                        if result["score"] > 0.05 or date_result["score"] > 0.2
                     ]
                     if verbose:
                         print(
                             f"[DEBUG] Number of filtered sections: {len(filtered_results)}"
                         )
-                    sorted_results = sorted(
-                        filtered_results, key=lambda x: x["score"], reverse=True
-                    )
 
                     truncated_to_full = {section[:200]: section for section in sections}
 
                     sections = [
-                        truncated_to_full[result["text"]] for result in sorted_results
+                        truncated_to_full[result["text"]] for result in filtered_results
                     ]
                 if not sections:
                     extracted_content = ""
