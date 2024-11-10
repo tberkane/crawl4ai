@@ -283,14 +283,22 @@ class AsyncWebCrawler:
                         top_k=len(truncated_sections),
                         return_documents=True,
                     )
+
+                    date_reranked_truncated_sections = self.reranker.rank(
+                        "date",
+                        truncated_sections,
+                        top_k=len(truncated_sections),
+                        return_documents=True,
+                    )
+
                     filtered_results = [
                         result
-                        for result in reranked_truncated_sections
-                        if result["score"] > rerank_threshold
-                        or (
-                            "updated" in result["text"].lower()
-                            or "published" in result["text"].lower()
+                        for result, date_result in zip(
+                            reranked_truncated_sections,
+                            date_reranked_truncated_sections,
                         )
+                        if result["score"] > rerank_threshold
+                        or date_result["score"] > 0.2
                     ]
                     if verbose:
                         print(
