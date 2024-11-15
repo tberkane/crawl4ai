@@ -18,20 +18,22 @@ from .content_scrapping_strategy import WebScrappingStrategy
 from .config import MIN_WORD_THRESHOLD, IMAGE_DESCRIPTION_MIN_WORD_THRESHOLD
 from .utils import sanitize_input_encode, InvalidCSSSelectorError, format_html
 
+from ._version import __version__ as crawl4ai_version
+
 
 class AsyncWebCrawler:
     def __init__(
         self,
         crawler_strategy: Optional[AsyncCrawlerStrategy] = None,
         always_by_pass_cache: bool = False,
-        base_directory: str = str(Path.home()),
+        base_directory: str = str(os.getenv("CRAWL4_AI_BASE_DIRECTORY", Path.home())),
         **kwargs,
     ):
         self.crawler_strategy = crawler_strategy or AsyncPlaywrightCrawlerStrategy(
             **kwargs
         )
         self.always_by_pass_cache = always_by_pass_cache
-        # self.crawl4ai_folder = os.path.join(Path.home(), ".crawl4ai")
+        # self.crawl4ai_folder = os.path.join(os.getenv("CRAWL4_AI_BASE_DIRECTORY", Path.home()), ".crawl4ai")
         self.crawl4ai_folder = os.path.join(base_directory, ".crawl4ai")
         os.makedirs(self.crawl4ai_folder, exist_ok=True)
         os.makedirs(f"{self.crawl4ai_folder}/cache", exist_ok=True)
@@ -48,9 +50,12 @@ class AsyncWebCrawler:
         await self.crawler_strategy.__aexit__(exc_type, exc_val, exc_tb)
 
     async def awarmup(self):
+        # Print a message for crawl4ai and its version
+        print(f"[LOG] 🚀 Crawl4AI {crawl4ai_version}")
         if self.verbose:
             print("[LOG] 🌤️  Warming up the AsyncWebCrawler")
-        await async_db_manager.ainit_db()
+        # await async_db_manager.ainit_db()
+        await async_db_manager.initialize()
         await self.arun(
             url="https://google.com/",
             word_count_threshold=5,
@@ -133,6 +138,7 @@ class AsyncWebCrawler:
                 async_response=async_response,
                 query=query,
                 rerank_threshold=rerank_threshold,
+                bypass_cache=bypass_cache,
                 **kwargs,
             )
             crawl_result.status_code = (
@@ -331,7 +337,11 @@ class AsyncWebCrawler:
 
         screenshot = None if not screenshot else screenshot
 
-        if not is_cached:
+        if (
+            not is_cached
+            or kwargs.get("bypass_cache", False)
+            or self.always_by_pass_cache
+        ):
             await async_db_manager.acache_url(
                 url,
                 html,
@@ -362,7 +372,8 @@ class AsyncWebCrawler:
         )
 
     async def aclear_cache(self):
-        await async_db_manager.aclear_db()
+        # await async_db_manager.aclear_db()
+        await async_db_manager.cleanup()
 
     async def aflush_cache(self):
         await async_db_manager.aflush_db()

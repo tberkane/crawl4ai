@@ -1,4 +1,4 @@
-# 🔥🕷️ Crawl4AI: LLM Friendly Web Crawler & Scrapper
+# 🔥🕷️ Crawl4AI: LLM Friendly Web Crawler & Scraper
 
 <a href="https://trendshift.io/repositories/11716" target="_blank"><img src="https://trendshift.io/api/badge/repositories/11716" alt="unclecode%2Fcrawl4ai | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 
@@ -12,19 +12,20 @@
 Crawl4AI simplifies asynchronous web crawling and data extraction, making it accessible for large language models (LLMs) and AI applications. 🆓🌐
 
 ## 🌟 Meet the Crawl4AI Assistant: Your Copilot for Crawling
+
 Use the [Crawl4AI GPT Assistant](https://tinyurl.com/crawl4ai-gpt) as your AI-powered copilot! With this assistant, you can:
+
 - 🧑‍💻 Generate code for complex crawling and extraction tasks
 - 💡 Get tailored support and examples
 - 📘 Learn Crawl4AI faster with step-by-step guidance
 
-## New in 0.3.72 ✨
+## New in 0.3.73 ✨
 
-- 📄 Fit markdown generation for extracting main article content.
-- 🪄 Magic mode for comprehensive anti-bot detection bypass.
-- 🌐 Enhanced multi-browser support with seamless switching (Chromium, Firefox, WebKit)
-- 📚 New chunking strategies(Sliding window, Overlapping window, Flexible size control)
-- 💾 Improved caching system for better performance
-- ⚡ Optimized batch processing with automatic rate limiting
+- 🐳 Docker Ready: Full API server with seamless deployment & scaling
+- 🎯 Browser Takeover: Use your own browser with cookies & history intact (CDP support)
+- 📝 Mockdown+: Enhanced tag preservation & content extraction
+- ⚡️ Parallel Power: Supercharged multi-URL crawling performance
+- 🌟 And many more exciting updates...
 
 ## Try it Now!
 
@@ -81,11 +82,13 @@ By default, this will install the asynchronous version of Crawl4AI, using Playwr
 👉 Note: When you install Crawl4AI, the setup script should automatically install and set up Playwright. However, if you encounter any Playwright-related errors, you can manually install it using one of these methods:
 
 1. Through the command line:
+
    ```bash
    playwright install
    ```
 
 2. If the above doesn't work, try this more specific command:
+
    ```bash
    python -m playwright install chromium
    ```
@@ -112,9 +115,53 @@ pip install -e .
 
 ### Using Docker 🐳
 
-We're in the process of creating Docker images and pushing them to Docker Hub. This will provide an easy way to run Crawl4AI in a containerized environment. Stay tuned for updates!
+Crawl4AI is available as Docker images for easy deployment. You can either pull directly from Docker Hub (recommended) or build from the repository.
 
-For more detailed installation instructions and options, please refer to our [Installation Guide](https://crawl4ai.com/mkdocs/installation).
+#### Option 1: Docker Hub (Recommended)
+
+```bash
+# Pull and run from Docker Hub (choose one):
+docker pull unclecode/crawl4ai:basic    # Basic crawling features
+docker pull unclecode/crawl4ai:all      # Full installation (ML, LLM support)
+docker pull unclecode/crawl4ai:gpu      # GPU-enabled version
+
+# Run the container
+docker run -p 11235:11235 unclecode/crawl4ai:basic  # Replace 'basic' with your chosen version
+```
+
+#### Option 2: Build from Repository
+
+```bash
+# Clone the repository
+git clone https://github.com/unclecode/crawl4ai.git
+cd crawl4ai
+
+# Build the image
+docker build -t crawl4ai:local \
+  --build-arg INSTALL_TYPE=basic \  # Options: basic, all
+  .
+
+# Run your local build
+docker run -p 11235:11235 crawl4ai:local
+```
+
+Quick test (works for both options):
+```python
+import requests
+
+# Submit a crawl job
+response = requests.post(
+    "http://localhost:11235/crawl",
+    json={"urls": "https://example.com", "priority": 10}
+)
+task_id = response.json()["task_id"]
+
+# Get results
+result = requests.get(f"http://localhost:11235/task/{task_id}")
+```
+
+For advanced configuration, environment variables, and usage examples, see our [Docker Deployment Guide](https://crawl4ai.com/mkdocs/basic/docker-deployment/).
+
 
 ## Quick Start 🚀
 
@@ -244,7 +291,7 @@ if __name__ == "__main__":
     asyncio.run(extract_news_teasers())
 ```
 
-For more advanced usage examples, check out our [Examples](https://crawl4ai.com/mkdocs/full_details/advanced_jsoncss_extraction.md) section in the documentation.
+For more advanced usage examples, check out our [Examples](https://crawl4ai.com/mkdocs/extraction/css-advanced/) section in the documentation.
 
 ### Extracting Structured Data with OpenAI
 
@@ -347,7 +394,8 @@ if __name__ == "__main__":
 
 This example demonstrates Crawl4AI's ability to handle complex scenarios where content is loaded asynchronously. It crawls multiple pages of GitHub commits, executing JavaScript to load new content and using custom hooks to ensure data is loaded before proceeding.
 
-For more advanced usage examples, check out our [Examples](https://crawl4ai.com/mkdocs/full_details/session_based_crawling.md) section in the documentation.
+For more advanced usage examples, check out our [Examples](https://crawl4ai.com/mkdocs/tutorial/episode_12_Session-Based_Crawling_for_Dynamic_Websites/) section in the documentation.
+</details>
 
 
 ## Speed Comparison 🚀
@@ -356,7 +404,7 @@ Crawl4AI is designed with speed as a primary focus. Our goal is to provide the f
 
 We've conducted a speed comparison between Crawl4AI and Firecrawl, a paid service. The results demonstrate Crawl4AI's superior performance:
 
-```
+```bash
 Firecrawl:
 Time taken: 7.02 seconds
 Content length: 42074 characters
@@ -374,6 +422,7 @@ Images found: 89
 ```
 
 As you can see, Crawl4AI outperforms Firecrawl significantly:
+
 - Simple crawl: Crawl4AI is over 4 times faster than Firecrawl.
 - With JavaScript execution: Even when executing JavaScript to load more content (doubling the number of images found), Crawl4AI is still faster than Firecrawl's simple crawl.
 
@@ -382,6 +431,30 @@ You can find the full comparison code in our repository at `docs/examples/crawl4
 ## Documentation 📚
 
 For detailed documentation, including installation instructions, advanced features, and API reference, visit our [Documentation Website](https://crawl4ai.com/mkdocs/).
+
+## Crawl4AI Roadmap 🗺️
+
+For detailed information on our development plans and upcoming features, check out our [Roadmap](https://github.com/unclecode/crawl4ai/blob/main/ROADMAP.md).
+
+### Advanced Crawling Systems 🔧
+- [x] 0. Graph Crawler: Smart website traversal using graph search algorithms for comprehensive nested page extraction
+- [ ] 1. Question-Based Crawler: Natural language driven web discovery and content extraction
+- [ ] 2. Knowledge-Optimal Crawler: Smart crawling that maximizes knowledge while minimizing data extraction
+- [ ] 3. Agentic Crawler: Autonomous system for complex multi-step crawling operations
+
+### Specialized Features 🛠️
+- [ ] 4. Automated Schema Generator: Convert natural language to extraction schemas
+- [ ] 5. Domain-Specific Scrapers: Pre-configured extractors for common platforms (academic, e-commerce)
+- [ ] 6. Web Embedding Index: Semantic search infrastructure for crawled content
+
+### Development Tools 🔨
+- [ ] 7. Interactive Playground: Web UI for testing, comparing strategies with AI assistance
+- [ ] 8. Performance Monitor: Real-time insights into crawler operations
+- [ ] 9. Cloud Integration: One-click deployment solutions across cloud providers
+
+### Community & Growth 🌱
+- [ ] 10. Sponsorship Program: Structured support system with tiered benefits
+- [ ] 11. Educational Content: "How to Crawl" video series and interactive tutorials
 
 ## Contributing 🤝
 
