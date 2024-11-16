@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional
 import json
 import asyncio
+import re
 from sentence_transformers import CrossEncoder
 from .models import CrawlResult
 from .async_database import async_db_manager
@@ -19,6 +20,18 @@ from .config import MIN_WORD_THRESHOLD, IMAGE_DESCRIPTION_MIN_WORD_THRESHOLD
 from .utils import sanitize_input_encode, InvalidCSSSelectorError, format_html
 
 from ._version import __version__ as crawl4ai_version
+
+
+def remove_markdown_links(text):
+    """
+    Remove all markdown links from a string.
+    """
+    # Remove inline links [text](url)
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    # Remove reference links [text][ref] and [ref]: url
+    text = re.sub(r"\[([^\]]+)\]\[[^\]]+\]", r"\1", text)
+    text = re.sub(r"^\[[^\]]+\]:\s*.*$", "", text, flags=re.MULTILINE)
+    return text
 
 
 class AsyncWebCrawler:
@@ -270,6 +283,7 @@ class AsyncWebCrawler:
                     extracted_content, indent=4, default=str, ensure_ascii=False
                 )
             else:
+                markdown = remove_markdown_links(markdown)
                 sections = chunking_strategy.chunk(markdown)
 
                 if query:
