@@ -91,7 +91,6 @@ class AsyncWebCrawler:
         user_agent: str = None,
         verbose=True,
         query: str = None,
-        rerank_threshold: float = 0.02,
         **kwargs,
     ) -> CrawlResult:
         try:
@@ -150,7 +149,6 @@ class AsyncWebCrawler:
                 bool(cached),
                 async_response=async_response,
                 query=query,
-                rerank_threshold=rerank_threshold,
                 bypass_cache=bypass_cache,
                 **kwargs,
             )
@@ -187,7 +185,6 @@ class AsyncWebCrawler:
         user_agent: str = None,
         verbose=True,
         query: str = None,
-        rerank_threshold: float = 0.02,
         **kwargs,
     ) -> List[CrawlResult]:
         tasks = [
@@ -202,7 +199,6 @@ class AsyncWebCrawler:
                 user_agent,
                 verbose,
                 query=query,
-                rerank_threshold=rerank_threshold,
                 **kwargs,
             )
             for url in urls
@@ -222,7 +218,6 @@ class AsyncWebCrawler:
         verbose: bool,
         is_cached: bool,
         query: str = None,
-        rerank_threshold: float = 0.02,
         **kwargs,
     ) -> CrawlResult:
         t = time.time()
@@ -316,7 +311,10 @@ class AsyncWebCrawler:
                         ),
                         key=lambda x: x["corpus_id"],
                     )
-
+                    rerank_threshold = np.percentile(
+                        [result["score"] for result in reranked_truncated_sections],
+                        90,
+                    )
                     filtered_results = [
                         result
                         for result, date_result in zip(
