@@ -24,13 +24,17 @@ from ._version import __version__ as crawl4ai_version
 
 def remove_markdown_links(text):
     """
-    Remove all markdown links from a string.
+    Remove all markdown links and images from a string.
     """
     # Remove inline links [text](url)
     text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
     # Remove reference links [text][ref] and [ref]: url
     text = re.sub(r"\[([^\]]+)\]\[[^\]]+\]", r"\1", text)
     text = re.sub(r"^\[[^\]]+\]:\s*.*$", "", text, flags=re.MULTILINE)
+    # Remove images ![alt text](url)
+    text = re.sub(r"!\[[^\]]*\]\([^)]+\)", "", text)
+    # Remove empty links []()
+    text = re.sub(r"\[\]\([^)]+\)", "", text)
     return text
 
 
