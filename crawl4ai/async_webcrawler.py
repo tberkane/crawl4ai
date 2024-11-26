@@ -338,7 +338,6 @@ class AsyncWebCrawler:
                     sections = [
                         truncated_to_full[result["text"]] for result in filtered_results
                     ]
-                    print(sections)
                 if not sections:
                     extracted_content = ""
                 else:
