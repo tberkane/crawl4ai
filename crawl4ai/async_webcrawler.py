@@ -642,7 +642,9 @@ class AsyncWebCrawler:
             tag="SCRAPE",
             params={"url": _url, "timing": int((time.perf_counter() - t1) * 1000)},
         )
-
+        print(
+            f"{extracted_content=}, {config.extraction_strategy=}, {config.chunking_strategy=}, {isinstance(config.extraction_strategy, NoExtractionStrategy)=}"
+        )
         # Handle content extraction if needed
         if (
             extracted_content is None
