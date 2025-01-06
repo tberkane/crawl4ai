@@ -676,7 +676,7 @@ class AsyncWebCrawler:
                 else config.chunking_strategy
             )
             sections = chunking.chunk(content)
-
+            print(f"[DEBUG] Number of sections: {len(sections)}")
             if query:
                 truncated_sections = [section[:200] for section in sections]
                 print(
