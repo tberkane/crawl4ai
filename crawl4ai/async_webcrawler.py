@@ -151,6 +151,7 @@ class AsyncWebCrawler:
             thread_safe: Whether to use thread-safe operations
             **kwargs: Additional arguments for backwards compatibility
         """
+        self.reranker = None
         # Handle browser configuration
         browser_config = config
         if browser_config is not None:
